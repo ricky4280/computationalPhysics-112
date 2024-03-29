@@ -47,67 +47,72 @@ def solve_ivp(func, t_span, y0, method, t_eval, args):
           t_span and t_eval. Be careful. 
 
     """
-
+    
+    time = t_span[0]
+    y = y0
     sol  = np.zeros((len(y0),len(t_eval))) # define the shape of the solution
 
-    #
-    # TODO:
-    #
-
-    return sol
-
-def _update(derive_func,y0, dt, t, method, *args):
-    """
-    Update the IVP with different numerical method
-
-    :param derive_func: the derivative of the function y'
-    :param y0: the initial conditions at time t
-    :param dt: the time step dt
-    :param t: the time
-    :param method: the numerical method
-    :param *args: extral parameters for the derive_func
-
-    :return: the next step condition y
-
-    """
-
     if method=="Euler":
-        ynext = _update_euler(derive_func,y0,dt,t,*args)
+        _update = _update_euler
     elif method=="RK2":
-        ynext = _update_rk2(derive_func,y0,dt,t,*args)
+        _update = _update_rk2
     elif method=="RK4":
-        ynext = _update_rk4(derive_func,y0,dt,t,*args)
+        _update = _update_rk4
     else:
         print("Error: mysolve doesn't supput the method",method)
         quit()
-    return ynext
+    
+    for n in np.arange(1, len(t_eval)):
+        dt = t_eval[n]-t_eval[n-1]
+        y = _update(func, y ,dt, t_eval[n], method, args*)
 
-def _update_euler(derive_func,y0,dt,t,*args):
+def update
+
+
+
+
+
+
+
+
+
+    ''''
+    for n ,t in enumerate(t_eval):
+        dt = t - time # t0: initial time, t: first time we define in t_eval
+        if dt > 0:
+            y = _update(func,y0, dt, t, *args)
+        
+        # record the solution
+        sol[:,n] = y
+        time += dt
+
+    return sol
+    '''
+
+def _update_euler(func,y0,dt,t,*args):
     """
     Update the IVP with the Euler's method
 
     :return: the next step solution y
 
     """
+    yderv = func(y0, dt, t, *args)
+    ynxt = y0 + yderv*dt
+    return ynxt
 
-    #
-    # TODO:
-    #
 
-    return y0 # <- change here. just a placeholder
-
-def _update_rk2(derive_func,y0,dt,t,*args):
+def _update_rk2(func,y0,dt,t,*args):
     """
     Update the IVP with the RK2 method
 
     :return: the next step solution y
     """
+    yderv = func(y0, dt, t, *args)
+    k1 = yderv(t, y0, *args)
+    k2 = yderv(t+dt, y0 + dt*k1, *args)
+    ynxt = y0 + dt/2*(k1+k2) 
 
-    #
-    # TODO:
-    #
-
-    return y0 # <- change here. just a placeholder
+    return ynxt 
 
 def _update_rk4(derive_func,y0,dt,t,*args):
     """
@@ -115,12 +120,14 @@ def _update_rk4(derive_func,y0,dt,t,*args):
 
     :return: the next step solution y
     """
-
-    #
-    # TODO:
-    #
-
-    return y0 # <- change here. just a placeholder
+    yderv = derive_func(y0, dt, t, *args)
+    k1 = yderv(t, y0, *args)
+    k2 = yderv(t+dt/2, y0 + dt/2*k1, *args)
+    k3 = yderv(t+dt/2, y0 + dt/2*k2, *args)
+    k4 = yderv(t+dt  , y0 + dt  *k3, *args)
+    ynxt = y0 + dt/6*(k1+2*k2+2*k3+k4)
+    
+    return ynxt
 
 if __name__=='__main__':
 
