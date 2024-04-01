@@ -48,32 +48,14 @@ def solve_ivp(func, t_span, y0, method, t_eval, args):
 
     """
     
-    time = t_span[0]
-    y = y0
-    sol  = np.zeros((len(y0),len(t_eval))) # define the shape of the solution
-
-    if method=="Euler":
-        _update = _update_euler
-    elif method=="RK2":
-        _update = _update_rk2
-    elif method=="RK4":
-        _update = _update_rk4
-    else:
-        print("Error: mysolve doesn't supput the method",method)
-        quit()
+    sol = np.zeros((len(y0), len(t_eval)))
+    '''
+    sol = np.zeros((3, 5))
+     array([[0., 0., 0., 0., 0.],
+            [0., 0., 0., 0., 0.],
+            [0., 0., 0., 0., 0.]])
+    '''
     
-    for n in np.arange(1, len(t_eval)):
-        dt = t_eval[n]-t_eval[n-1]
-        y = _update(func, y ,dt, t_eval[n], method, args*)
-
-def update
-
-
-
-
-
-
-
 
 
     ''''
@@ -126,7 +108,7 @@ def _update_rk4(derive_func,y0,dt,t,*args):
     k3 = yderv(t+dt/2, y0 + dt/2*k2, *args)
     k4 = yderv(t+dt  , y0 + dt  *k3, *args)
     ynxt = y0 + dt/6*(k1+2*k2+2*k3+k4)
-    
+
     return ynxt
 
 if __name__=='__main__':
@@ -165,15 +147,4 @@ if __name__=='__main__':
  
         return y # <- change here. just a placeholder
 
-    t_span = (0, 10)
-    y0     = np.array([1,0])
-    t_eval = np.linspace(0,1,100)
-
-    K = 1
-    M = 1
-
-    sol = solve_ivp(oscillator, t_span, y0, 
-                    method="Euler",t_eval=t_eval, args=(K,M))
-
-    print("sol=",sol[0])
-    print("Done!")
+   
