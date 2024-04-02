@@ -1,6 +1,5 @@
 import numpy as np
 """
-
 This program solves Initial Value Problems (IVP).
 We support three numerical meothds: Euler, Rk2, and Rk4
 
@@ -25,7 +24,6 @@ Example Usage:
 Author: Kuo-Chuan Pan, NTHU 2022.10.06
                             2024.03.08
 For the course, computational physics
-
 """
 def solve_ivp(func, t_span, y0, method, t_eval, args):
     """
@@ -47,36 +45,44 @@ def solve_ivp(func, t_span, y0, method, t_eval, args):
           t_span and t_eval. Be careful. 
 
     """
-    
+
     sol = np.zeros((len(y0), len(t_eval)))
     '''
     sol = np.zeros((3, 5))
      array([[0., 0., 0., 0., 0.],
             [0., 0., 0., 0., 0.],
             [0., 0., 0., 0., 0.]])
+
+    sol[:,3] = 1
+     array([[0., 0., 0., 1., 0.],
+            [0., 0., 0., 1., 0.],
+            [0., 0., 0., 1., 0.]])
     '''
+    # set the numerical solver based on "method"
+    if method=="Euler":
+        _update = _update_euler
+    elif method=="RK2":
+        _update = _update_rk2
+    elif method=="RK4":
+        _update = _update_rk4
+    else:
+        print("Error: mysolve doesn't supput the method",method)
+        quit()
     
-
-
-    ''''
-    for n ,t in enumerate(t_eval):
-        dt = t - time # t0: initial time, t: first time we define in t_eval
+    for n, t in enumerate(t_eval):
+        dt = t_eval[1]-t_eval[0]
         if dt > 0:
             y = _update(func,y0, dt, t, *args)
-        
-        # record the solution
-        sol[:,n] = y
-        time += dt
+
+        # record the solution, nth column = y
+        sol[:,n]=y 
 
     return sol
-    '''
 
 def _update_euler(func,y0,dt,t,*args):
     """
     Update the IVP with the Euler's method
-
     :return: the next step solution y
-
     """
     yderv = func(y0, dt, t, *args)
     ynxt = y0 + yderv*dt
@@ -86,7 +92,6 @@ def _update_euler(func,y0,dt,t,*args):
 def _update_rk2(func,y0,dt,t,*args):
     """
     Update the IVP with the RK2 method
-
     :return: the next step solution y
     """
     yderv = func(y0, dt, t, *args)
@@ -99,7 +104,6 @@ def _update_rk2(func,y0,dt,t,*args):
 def _update_rk4(derive_func,y0,dt,t,*args):
     """
     Update the IVP with the RK4 method
-
     :return: the next step solution y
     """
     yderv = derive_func(y0, dt, t, *args)
@@ -115,13 +119,11 @@ if __name__=='__main__':
 
 
     """
-    
     Testing solver.solve_ivp()
 
     Kuo-Chuan Pan 2022.10.07
 
     """
-
 
     def oscillator(t,y,K,M):
         """
