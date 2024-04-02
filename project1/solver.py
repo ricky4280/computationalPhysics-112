@@ -45,9 +45,10 @@ def solve_ivp(func, t_span, y0, method, t_eval, args):
           t_span and t_eval. Be careful. 
 
     """
-
+    time = t_span[0]
     sol = np.zeros((len(y0), len(t_eval)))
     '''
+    define the shape of the solution
     sol = np.zeros((3, 5))
      array([[0., 0., 0., 0., 0.],
             [0., 0., 0., 0., 0.],
@@ -70,7 +71,7 @@ def solve_ivp(func, t_span, y0, method, t_eval, args):
         quit()
     
     for n, t in enumerate(t_eval):
-        dt = t_eval[1]-t_eval[0]
+        dt = t-time
         if dt > 0:
             y = _update(func,y0, dt, t, *args)
 
@@ -142,11 +143,23 @@ if __name__=='__main__':
         :param M: the mass of the oscillator
 
         """
+        force = - K * y[0] # the force on the oscillator
+        A = force/M        # the accerlation
 
-        #
-        # TODO:
-        #
- 
-        return y # <- change here. just a placeholder
+        f = np.zeros(len(y)) # y' has the same dimension of y
+        f[0] = y[1]
+        f[1] = A
+        return f
 
-   
+    t_span = (0, 10)
+    y0     = np.array([1,0])
+    t_eval = np.linspace(0,1,100)
+
+    K = 1
+    M = 1
+
+    sol = solve_ivp(oscillator, t_span, y0, 
+                    method="RK4",t_eval=t_eval, args=(K,M))
+
+    print("sol=",sol[0])
+    print("Done!")
