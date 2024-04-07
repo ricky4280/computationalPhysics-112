@@ -46,7 +46,9 @@ def solve_ivp(func, t_span, y0, method, t_eval, args):
 
     """
     time = t_span[0]
+    y = y0
     sol = np.zeros((len(y0), len(t_eval)))
+   
     '''
     define the shape of the solution
     sol = np.zeros((3, 5))
@@ -71,12 +73,13 @@ def solve_ivp(func, t_span, y0, method, t_eval, args):
         quit()
     
     for n, t in enumerate(t_eval):
-        dt = t-time
+        dt = t_eval[1]-t_eval[0]
         if dt > 0:
-            y = _update(func,y0, dt, t, *args)
+            y = _update(func, y, dt, t, *args)
 
         # record the solution, nth column = y
-        sol[:,n]=y 
+        sol[:,n]=y
+        time+=dt
 
     return sol
 
@@ -105,16 +108,18 @@ def _update_rk2(func,y0,dt,t,*args):
 def _update_rk4(derive_func,y0,dt,t,*args):
     """
     Update the IVP with the RK4 method
-    :return: the next step solution y
     """
-    yderv = derive_func(y0, dt, t, *args)
-    k1 = yderv(t, y0, *args)
-    k2 = yderv(t+dt/2, y0 + dt/2*k1, *args)
-    k3 = yderv(t+dt/2, y0 + dt/2*k2, *args)
-    k4 = yderv(t+dt  , y0 + dt  *k3, *args)
-    ynxt = y0 + dt/6*(k1+2*k2+2*k3+k4)
-
+    dt2 = 0.5*dt 
+    k1  = derive_func(t,y0,*args)
+    y1  = y0 + k1 * dt2
+    k2  = derive_func(t+dt2,y1,*args)
+    y2  = y0 + k2 * dt2
+    k3  = derive_func(t+dt2,y2,*args)
+    y3  = y0 + k3 * dt
+    k4  = derive_func(t+dt,y3,*args)
+    ynxt = y0 + dt*(k1+ 2*k2 + 2*k3 + k4)/6.0   
     return ynxt
+
 
 if __name__=='__main__':
 
@@ -126,40 +131,4 @@ if __name__=='__main__':
 
     """
 
-    def oscillator(t,y,K,M):
-        """
-        The derivate function for an oscillator
-        In this example, we set
-
-        y[0] = x
-        y[1] = v
-
-        yderive[0] = x' = v
-        yderive[1] = v' = a
-
-        :param t: the time
-        :param y: the initial condition y
-        :param K: the spring constant
-        :param M: the mass of the oscillator
-
-        """
-        force = - K * y[0] # the force on the oscillator
-        A = force/M        # the accerlation
-
-        f = np.zeros(len(y)) # y' has the same dimension of y
-        f[0] = y[1]
-        f[1] = A
-        return f
-
-    t_span = (0, 10)
-    y0     = np.array([1,0])
-    t_eval = np.linspace(0,1,100)
-
-    K = 1
-    M = 1
-
-    sol = solve_ivp(oscillator, t_span, y0, 
-                    method="RK4",t_eval=t_eval, args=(K,M))
-
-    print("sol=",sol[0])
-    print("Done!")
+ 
