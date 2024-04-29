@@ -81,8 +81,8 @@ class NBodySimulator:
             _advance_particles = self._advance_particles_RK2
         elif method.lower() == "rk4":
             _advance_particles = self._advance_particles_RK4
-        elif method.lower() == "lfs":
-            _advance_particles = self._advance_particles_LFS
+        elif method.lower() == "lf":
+            _advance_particles = self._advance_particles_LF
         else:
             raise ValueError("Unknown method")
 
@@ -216,7 +216,7 @@ class NBodySimulator:
 
         return particles
     
-    def _advance_particles_LFS(self, dt, particles):
+    def _advance_particles_LF(self, dt, particles):
         
         nparticles = particles.nparticles
         masses = particles.masses
@@ -227,7 +227,9 @@ class NBodySimulator:
         # do the leap frog scheme
         vel += acc*dt/2
         pos += vel*dt
-        
+        acc = self._calculate_acceleration(nparticles, masses, pos)
+        vel += acc*dt/2
+
         particles.set_particles(pos, vel, acc)
 
         return particles
