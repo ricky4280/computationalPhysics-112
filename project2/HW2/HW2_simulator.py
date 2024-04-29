@@ -81,6 +81,8 @@ class NBodySimulator:
             _advance_particles = self._advance_particles_RK2
         elif method.lower() == "rk4":
             _advance_particles = self._advance_particles_RK4
+        elif method.lower() == "lfs":
+            _advance_particles = self._advance_particles_LFS
         else:
             raise ValueError("Unknown method")
 
@@ -115,7 +117,7 @@ class NBodySimulator:
 
             # update the time
             time += dt
-
+        
         print("Simulation is done!")
         return
 
@@ -213,6 +215,25 @@ class NBodySimulator:
         particles.set_particles(pos, vel, acc)
 
         return particles
+    
+    def _advance_particles_LFS(self, dt, particles):
+        
+        nparticles = particles.nparticles
+        masses = particles.masses
+        pos = particles.positions
+        vel = particles.velocities
+        acc = self._calculate_acceleration(nparticles, masses, pos)
+
+        # do the leap frog scheme
+        vel += acc*dt/2
+        pos += vel*dt
+        
+        particles.set_particles(pos, vel, acc)
+
+        return particles
+
+
+
 
 # Most important part of the code
 @njit(parallel=True) # numba to accelerate the code

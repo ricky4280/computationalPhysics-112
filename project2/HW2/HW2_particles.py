@@ -83,6 +83,11 @@ class Particles:
         self._tags = some_tags
         return
     
+    @time.setter
+    def time(self, new_time):  
+        self._tags = new_time
+        return
+    
     def set_particles(self, pos, vel, acc):
         """
         Set particle properties for the N-body simulation
@@ -123,7 +128,7 @@ class Particles:
         """
         return
         
-    def output(self, filename):
+    def output(self, filename, time=0):
         """
         Output particle properties to a file
 
@@ -134,7 +139,7 @@ class Particles:
         vel = self.velocities
         acc = self.accelerations
         tags = self.tags
-        time = self.time
+        KE, PE = self.energy(G=1, rsoft=0.1)
         header = """
                 ----------------------------------------------------
                 Data from a 3D direct N-body simulation. 
@@ -146,7 +151,11 @@ class Particles:
 
                 ----------------------------------------------------
                 """
-        header += "Time = {}".format(time)
+        header += "Time = {}\n".format(time)
+        header += "                Total Kinetic Energy = {}\n".format(KE)
+        header += "                Total Potential Energy = {}\n".format(PE)
+        header += "                Total Energy = {}\n".format(PE+KE)
+
         np.savetxt(filename,(tags[:],masses[:,0],
                             pos[:,0],pos[:,1],pos[:,2],
                             vel[:,0],vel[:,1],vel[:,2],
@@ -180,3 +189,20 @@ class Particles:
         plt.show()
 
         return fig, ax
+
+    def energy(self, G, rsoft):
+        """
+        Compute the total kinetic energy and the potential energy of the particles.
+        """
+        # kinetic energy/ sum three directions/ turn into (N,1) array to match masses
+        KE = 0.5 * np.sum(self.masses * np.sum(self.velocities**2, axis=1)[:, np.newaxis])
+
+        # potential energy
+        PE = 0
+        for i in range(self.nparticles):
+            for j in range(self.nparticles):
+                if (j>i): 
+                    rij = self.positions[i,:] - self.positions[j,:]
+                    r = np.sqrt(np.sum(rij**2) + rsoft**2)
+                    PE += - G * self.masses[i,0] * self.masses[j,0] / r
+        return KE, PE
