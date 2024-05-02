@@ -113,7 +113,7 @@ class NBodySimulator:
                 # output the data
                 fn = self.io_header+"_"+str(n).zfill(6)+".dat"
                 fn = io_folder+"/"+fn
-                particles.output(fn)    # ouput the data by output function in particles.py
+                particles.output(fn, time)    # ouput the data by output function in particles.py
 
             # update the time
             time += dt

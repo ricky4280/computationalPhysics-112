@@ -205,4 +205,4 @@ class Particles:
                     rij = self.positions[i,:] - self.positions[j,:]
                     r = np.sqrt(np.sum(rij**2) + rsoft**2)
                     PE += - G * self.masses[i,0] * self.masses[j,0] / r
-        return KE, PE
+        return KE, PE 
